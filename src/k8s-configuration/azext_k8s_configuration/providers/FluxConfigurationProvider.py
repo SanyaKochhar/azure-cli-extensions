@@ -46,7 +46,7 @@ from ..validators import (
     validate_url_with_params,
 )
 from .. import consts
-from ..vendored_sdks.v2022_01_01_preview.models import (
+from ..vendored_sdks.v2022_03_01.models import (
     FluxConfiguration,
     FluxConfigurationPatch,
     GitRepositoryDefinition,
@@ -55,10 +55,9 @@ from ..vendored_sdks.v2022_01_01_preview.models import (
     RepositoryRefDefinition,
     KustomizationDefinition,
     KustomizationPatchDefinition,
-    DependsOnDefinition,
     SourceKindType,
 )
-from ..vendored_sdks.v2021_09_01.models import Extension, Identity
+from ..vendored_sdks.v2022_03_01.models import Extension, Identity
 
 logger = get_logger(__name__)
 
@@ -384,17 +383,10 @@ def create_kustomization(
             consts.CREATE_KUSTOMIZATION_EXIST_HELP,
         )
 
-    # Add the dependencies in their model to the kustomization
-    model_dependencies = None
-    if dependencies:
-        model_dependencies = []
-        for dep in parse_dependencies(dependencies):
-            model_dependencies.append(DependsOnDefinition(kustomization_name=dep))
-
     kustomization = {
         kustomization_name: KustomizationPatchDefinition(
             path=path,
-            depends_on=model_dependencies,
+            depends_on=parse_dependencies(dependencies),
             timeout_in_seconds=parse_duration(timeout),
             sync_interval_in_seconds=parse_duration(sync_interval),
             retry_interval_in_seconds=parse_duration(retry_interval),
@@ -451,17 +443,10 @@ def update_kustomization(
             consts.UPDATE_KUSTOMIZATION_NO_EXIST_HELP,
         )
 
-    # Add the dependencies in their model to the kustomization
-    model_dependencies = None
-    if dependencies:
-        model_dependencies = []
-        for dep in parse_dependencies(dependencies):
-            model_dependencies.append(DependsOnDefinition(kustomization_name=dep))
-
     kustomization = {
         kustomization_name: KustomizationPatchDefinition(
             path=path,
-            depends_on=model_dependencies,
+            depends_on=parse_dependencies(dependencies),
             timeout_in_seconds=parse_duration(timeout),
             sync_interval_in_seconds=parse_duration(sync_interval),
             retry_interval_in_seconds=parse_duration(retry_interval),
